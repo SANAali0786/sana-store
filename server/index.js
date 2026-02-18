@@ -1,4 +1,6 @@
-require('dotenv').config(); // MUST stay at the very top
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 const express = require("express");
 const cors = require('cors');
 const bcrypt = require('bcrypt');
@@ -14,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cors({
-  origin: "http://localhost:5173", 
+  origin: ["http://localhost:5173", "https://sana-store.vercel.app/" ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE"]
 }));
@@ -30,10 +32,10 @@ app.use(session({
   saveUninitialized: false,
   cookie: { 
     maxAge: 30 * 24 * 60 * 60 * 1000, 
-    secure: false, // Set to true if using HTTPS
+    secure: process.env.NODE_ENV === "production", 
     httpOnly: true,
-    sameSite: 'lax'
-  }
+    sameSite: process.env.NODE_ENV === "production" ? 'none' : 'lax'
+}
 }));
 
 // --- 3. AUTH ROUTES ---
